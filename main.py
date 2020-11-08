@@ -1,6 +1,5 @@
 import ast
 import copy
-import os
 from tkinter import *
 from PyQt5 import QtWidgets, QtWebEngineWidgets
 import folium
@@ -10,6 +9,7 @@ import io
 import sys
 import time
 
+# ### File Load ### #
 file = open('./statics/vertexInfo.txt', 'r')
 contents = file.read()
 vertexInfo = ast.literal_eval(contents)
@@ -22,46 +22,68 @@ file = open('./statics/keyword.txt', 'r')
 contents = file.read()
 name2Keyword = ast.literal_eval(contents)
 file.close()
+file = open('./statics/pathCoordinate.txt', 'r')
+contents = file.read()
+pathCoord = ast.literal_eval(contents)
+file.close()
+
+routeName = []
 
 now = time.localtime()
-
 timeSet = []
 timeTemp = 0
 
-for i in range(6):
+for i in range(10):
+    mday = now.tm_mday
     hour = now.tm_hour
     min = now.tm_min + timeTemp
     if min >= 60:
         hour += 1
         min -= 60
-    timeSet.append("%04d-%02d-%02dT%02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, hour, min, now.tm_sec))
-    timeTemp += 5
-
-lines = [{'coordinates': [[127.127343, 37.450864], [127.127407, 37.450523], ],
-          'dates': [timeSet[0], timeSet[1]], 'color': 'red'},
-         {'coordinates': [[127.127407, 37.450523], [127.129300, 37.450067], ],
-          'dates': [timeSet[2], timeSet[3]], 'color': 'blue'},
-         {'coordinates': [[127.129300, 37.450067], [127.129665, 37.450391], ],
-          'dates': [timeSet[4], timeSet[5]], 'color': 'green'}, ]
-
-
-features = [{'type': 'Feature', 'geometry': {'type': 'LineString', 'coordinates': line['coordinates'], },
-             'properties': {'times': line['dates'],
-                            'style': {'color': line['color'], 'weight': line['weight'] if 'weight' in line else 5}
-                            }
-             } for line in lines]
+    elif hour >= 60:
+        mday += 1
+        hour -= 60
+    timeSet.append("%04d-%02d-%02dT%02d:%02d:%02d" % (now.tm_year, now.tm_mon, mday, hour, min, now.tm_sec))
+    timeTemp += 7
 
 
 def showMap():
     app = QtWidgets.QApplication(sys.argv)
+    # print(len(routeName))
+
+    colors = ['red', 'blue', 'green', 'black']
+
+    lines = []
+
+    timePos = 0
+    if len(routeName) == 2:
+        coordName = pathCoord[routeName[0] + ' -> ' + routeName[1]]
+        # print(len(coordName))
+        for j in range(len(coordName)):
+            lines.append(
+                {'coordinates': coordName[j], 'dates': [timeSet[timePos], timeSet[timePos + 1]], 'color': colors[j]})
+            timePos += 1
+    elif len(routeName) == 3:
+        coordName = []
+        for i in range(2):
+            coordName.append(pathCoord[routeName[i] + ' -> ' + routeName[i + 1]])
+        # print(coordName)
+        for j in range(len(coordName)):
+            for k in range(len(coordName[j])):
+                lines.append(
+                    {'coordinates': coordName[j][k], 'dates': [timeSet[timePos], timeSet[timePos + 1]],
+                     'color': colors[k]})
+                timePos += 1
+
+    # print(lines)
+    features = [{'type': 'Feature', 'geometry': {'type': 'LineString', 'coordinates': line['coordinates'], },
+                 'properties': {'times': line['dates'],
+                                'style': {'color': line['color'], 'weight': line['weight'] if 'weight' in line else 5}
+                                }
+                 } for line in lines]
 
     m = folium.Map(
         location=[37.4500597, 127.1276783], tiles="OpenStreetMap", zoom_start=17)
-
-    # folium.Marker(location=[37.4500597, 127.1276783], popup='가천대 정문', tooltip="가천대 정문").add_to(m)
-    # folium.Marker(location=[37.4503, 127.1276783], popup='가천대 정문', tooltip="가천대 정문").add_to(m)
-    # folium.Marker(location=[37.4507, 127.1276783], popup='가천대 정문', tooltip="가천대 정문").add_to(m)
-    # m.add_child(folium.LatLngPopup())
 
     plugins.TimestampedGeoJson({'type': 'FeatureCollection', 'features': features, }, period='PT1M',
                                add_last_point=True).add_to(m)
@@ -100,8 +122,6 @@ def findPath(startP, endP):
                 routing[toGo]['route'].append(visit)
 
     visitPlace(departure)
-
-    routeName = []
 
     while 1:
         minDist = max(routing.values(), key=lambda x: x['shortestDist'])['shortestDist']
