@@ -139,8 +139,9 @@ def findPath(startP, endP):
     # 경로 정리
     Route = (routing[destination]['route'])
     Route.append(destination)
-    # 'A' --> '가천관' 명칭 변경
-    for i in range(len(Route)):
+
+    routeName.clear()  # 길 찾기 연속 클릭 시 리스트 내에 경로 쌓이는 것 방지
+    for i in range(len(Route)):  # 'A' --> '가천관' 명칭 변경
         routeName.append(vertexInfo[Route[i]][0])
 
     ShortestDistance = routing[destination]['shortestDist']
@@ -174,14 +175,14 @@ frameDeparture = Frame(root, bg='#80c1ff', bd=5)
 frameDeparture.place(relx=0.2, rely=0.15, relwidth=0.3, relheight=0.1, anchor='n')
 departureLabel = Label(frameDeparture, text="출발지", width=30)
 departureLabel.place(relwidth=0.3, relheight=1)
-departureInput = Entry(frameDeparture, font=40)
+departureInput = Entry(frameDeparture, font=5)
 departureInput.place(relx=0.35, relwidth=0.65, relheight=1)
 
 frameDestination = Frame(root, bg='#80c1ff', bd=5)
 frameDestination.place(relx=0.55, rely=0.15, relwidth=0.3, relheight=0.1, anchor='n')
 destinationLabel = Label(frameDestination, text="목적지", width=30)
 destinationLabel.place(relwidth=0.3, relheight=1)
-destinationInput = Entry(frameDestination, font=40)
+destinationInput = Entry(frameDestination, font=5)
 destinationInput.place(relx=0.35, relwidth=0.65, relheight=1)
 
 button = Button(root, text="최단거리 찾기",
