@@ -10,6 +10,7 @@ import sys
 import time
 
 # ### File Load ### #
+#import stored information from a file
 file = open('./statics/vertexInfo.txt', 'r')
 contents = file.read()
 vertexInfo = ast.literal_eval(contents)
@@ -46,7 +47,7 @@ for i in range(10):
     timeSet.append("%04d-%02d-%02dT%02d:%02d:%02d" % (now.tm_year, now.tm_mon, mday, hour, min, now.tm_sec))
     timeTemp += 7
 
-
+#show map and route
 def showMap():
     app = QtWidgets.QApplication(sys.argv)
     # print(len(routeName))
@@ -97,9 +98,9 @@ def showMap():
     w.show()
     sys.exit(app.exec_())
 
-
+#find the shortest distance from the entered starting point to destination
 def findPath(startP, endP):
-    # 출발지 도착지를 설정해준다
+    # input starting point and destination
     departureName = startP.get()
     destinationName = endP.get()
 
@@ -108,7 +109,8 @@ def findPath(startP, endP):
 
     print("-----------[", departureName, "->", destinationName, "]----------")
 
-    routing = {}  # routing dictionary에 shortestDist=최단거리, route=최단경로 저장
+    # save shortestDist=shortest distance, route=shortest path in routing dictionary
+    routing = {}  
     for place in calInfo.keys():
         routing[place] = {'shortestDist': 0, 'route': [], 'visited': 0}
 
@@ -136,12 +138,12 @@ def findPath(startP, endP):
         visitPlace(toVisit)
         print("[" + vertexInfo[toVisit][0] + "] 까지의 최단거리: 약" + str(minDist) + "m")
 
-    # 경로 정리
+    # arragement route
     Route = (routing[destination]['route'])
     Route.append(destination)
 
-    routeName.clear()  # 길 찾기 연속 클릭 시 리스트 내에 경로 쌓이는 것 방지
-    for i in range(len(Route)):  # 'A' --> '가천관' 명칭 변경
+    routeName.clear()  # prevent path stacking in the list when user click find a way consecutively
+    for i in range(len(Route)):  # rename 'A' --> '가천관' 
         routeName.append(vertexInfo[Route[i]][0])
 
     ShortestDistance = routing[destination]['shortestDist']
@@ -149,15 +151,15 @@ def findPath(startP, endP):
         routeName) + '\n\n' + "최단 거리 : " + "약 " + str(ShortestDistance) + 'm\n'
     label['text'] = testResult
 
-    # 결과 출력 후에 지도 버튼 생성
+    # generate map buttons after outputting results
     btn_map = Button(root, text="지도",
                      command=lambda: showMap())
     btn_map.place(relx=0.89, rely=0.9, relwidth=0.1, relheight=0.08)
 
-
 Height = 363
 Width = 600
 
+#implement GUI through python thinker
 root = Tk()
 root.title("가천 길 찾기")
 # root.geometry("440x450")
