@@ -4,13 +4,11 @@ from tkinter import *
 from PyQt5 import QtWidgets, QtWebEngineWidgets
 import folium
 import folium.plugins as plugins
-import numpy as np
 import io
 import sys
 import time
 
 # ### File Load ### #
-#import stored information from a file
 file = open('./statics/vertexInfo.txt', 'r')
 contents = file.read()
 vertexInfo = ast.literal_eval(contents)
@@ -34,7 +32,9 @@ now = time.localtime()
 timeSet = []
 timeTemp = 0
 
-for i in range(10):
+for i in range(20):
+    year = now.tm_year
+    month = now.tm_mon
     mday = now.tm_mday
     hour = now.tm_hour
     min = now.tm_min + timeTemp
@@ -44,10 +44,10 @@ for i in range(10):
     elif hour >= 60:
         mday += 1
         hour -= 60
-    timeSet.append("%04d-%02d-%02dT%02d:%02d:%02d" % (now.tm_year, now.tm_mon, mday, hour, min, now.tm_sec))
+    timeSet.append("%04d-%02d-%02dT%02d:%02d:%02d" % (year, month, mday, hour, min, now.tm_sec))
     timeTemp += 7
 
-#show map and route
+
 def showMap():
     app = QtWidgets.QApplication(sys.argv)
     # print(len(routeName))
@@ -64,11 +64,11 @@ def showMap():
             lines.append(
                 {'coordinates': coordName[j], 'dates': [timeSet[timePos], timeSet[timePos + 1]], 'color': colors[j]})
             timePos += 1
-    elif len(routeName) == 3:
+    else:
         coordName = []
-        for i in range(2):
+        for i in range((len(routeName) - 1)):
             coordName.append(pathCoord[routeName[i] + ' -> ' + routeName[i + 1]])
-        # print(coordName)
+
         for j in range(len(coordName)):
             for k in range(len(coordName[j])):
                 lines.append(
@@ -98,9 +98,9 @@ def showMap():
     w.show()
     sys.exit(app.exec_())
 
-#find the shortest distance from the entered starting point to destination
+
 def findPath(startP, endP):
-    # input starting point and destination
+    # 출발지 도착지를 설정해준다
     departureName = startP.get()
     destinationName = endP.get()
 
@@ -109,9 +109,8 @@ def findPath(startP, endP):
 
     print("-----------[", departureName, "->", destinationName, "]----------")
 
-    # save shortestDist=shortest distance, route=shortest path in routing dictionary
-    routing = {}  
-    for place in calInfo.keys():
+    routing = {}  # routing dictionary에 shortestDist=최단거리, route=최단경로 저장
+    for place in calInfo.keys():  # 지도상의 모든 건물들과 각 건물들까지의 최단 거리를 나타낼 표를 만든다.
         routing[place] = {'shortestDist': 0, 'route': [], 'visited': 0}
 
     def visitPlace(visit):
@@ -123,27 +122,31 @@ def findPath(startP, endP):
                 routing[toGo]['route'] = copy.deepcopy(routing[visit]['route'])
                 routing[toGo]['route'].append(visit)
 
+    # 출발지와 목적지가 직접 길로 이어진 건물들까지의 최단 거리는 지도에 표시된 값으로 적고 그렇지 않은 건물들은 빈 칸으로 놓아둔다. 여기서 빈 칸의 값은 무한대를 뜻한다.
     visitPlace(departure)
 
     while 1:
+        # 거리가 가장 짧은 건물부터 긴 건물 순으로 방문, 방문한 건물은 표시
         minDist = max(routing.values(), key=lambda x: x['shortestDist'])['shortestDist']
         toVisit = ''
         for name, search in routing.items():
             if 0 < search['shortestDist'] <= minDist and not search['visited']:
                 minDist = search['shortestDist']
                 toVisit = name
+        # 그래프의 모든 건물들을 방문할 때까지 위 아래의 과정을 반복한다.
         if toVisit == '':
             break
 
+        # 새로운 건물을 방문하면 그 건물과 이어진 건물들까지의 거리를 새로 바꾼다. 단, 이전에 이미 최단 거리가 구해졌었다면 거리를 서로 비교해 작은 것으로 바꾸거나 유지한다.
         visitPlace(toVisit)
         print("[" + vertexInfo[toVisit][0] + "] 까지의 최단거리: 약" + str(minDist) + "m")
 
-    # arragement route
+    # 경로 정리
     Route = (routing[destination]['route'])
     Route.append(destination)
 
-    routeName.clear()  # prevent path stacking in the list when user click find a way consecutively
-    for i in range(len(Route)):  # rename 'A' --> '가천관' 
+    routeName.clear()  # 길 찾기 연속 클릭 시 리스트 내에 경로 쌓이는 것 방지
+    for i in range(len(Route)):  # 'A' --> '가천관' 명칭 변경
         routeName.append(vertexInfo[Route[i]][0])
 
     ShortestDistance = routing[destination]['shortestDist']
@@ -151,15 +154,18 @@ def findPath(startP, endP):
         routeName) + '\n\n' + "최단 거리 : " + "약 " + str(ShortestDistance) + 'm\n'
     label['text'] = testResult
 
-    # generate map buttons after outputting results
+    # 결과 출력 후에 지도 버튼 생성
     btn_map = Button(root, text="지도",
                      command=lambda: showMap())
     btn_map.place(relx=0.89, rely=0.9, relwidth=0.1, relheight=0.08)
 
+
+# -----------------------------
+# # GUI 구현
+# -----------------------------
 Height = 363
 Width = 600
 
-#implement GUI through python thinker
 root = Tk()
 root.title("가천 길 찾기")
 # root.geometry("440x450")
