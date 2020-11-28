@@ -44,6 +44,12 @@ for i in range(20):
     elif hour >= 60:
         mday += 1
         hour -= 60
+    elif mday >= 30:
+        month += 1
+        mday -= 29
+    elif month > 12:
+        year += 1
+        month -= 11
     timeSet.append("%04d-%02d-%02dT%02d:%02d:%02d" % (year, month, mday, hour, min, now.tm_sec))
     timeTemp += 7
 
@@ -76,7 +82,7 @@ def showMap():
                      'color': colors[k]})
                 timePos += 1
 
-    # print(lines)
+    print(lines)
     features = [{'type': 'Feature', 'geometry': {'type': 'LineString', 'coordinates': line['coordinates'], },
                  'properties': {'times': line['dates'],
                                 'style': {'color': line['color'], 'weight': line['weight'] if 'weight' in line else 5}
@@ -99,8 +105,11 @@ def showMap():
     sys.exit(app.exec_())
 
 
+###########################################################################
+# Find the shortest distance from the entered starting point to destination
+###########################################################################
 def findPath(startP, endP):
-    # 출발지 도착지를 설정해준다
+    # Input starting point and destination
     departureName = startP.get()
     destinationName = endP.get()
 
@@ -109,8 +118,9 @@ def findPath(startP, endP):
 
     print("-----------[", departureName, "->", destinationName, "]----------")
 
-    routing = {}  # routing dictionary에 shortestDist=최단거리, route=최단경로 저장
-    for place in calInfo.keys():  # 지도상의 모든 건물들과 각 건물들까지의 최단 거리를 나타낼 표를 만든다.
+    # Save 'shortestDist=shortest distance', 'route=shortest path' in routing dictionary
+    routing = {}
+    for place in calInfo.keys():  # Make a table showing all the buildings on the map and the shortest distance to each building.
         routing[place] = {'shortestDist': 0, 'route': [], 'visited': 0}
 
     def visitPlace(visit):
@@ -122,31 +132,39 @@ def findPath(startP, endP):
                 routing[toGo]['route'] = copy.deepcopy(routing[visit]['route'])
                 routing[toGo]['route'].append(visit)
 
-    # 출발지와 목적지가 직접 길로 이어진 건물들까지의 최단 거리는 지도에 표시된 값으로 적고 그렇지 않은 건물들은 빈 칸으로 놓아둔다. 여기서 빈 칸의 값은 무한대를 뜻한다.
+    """
+    Write down the shortest distance to the buildings
+    where the starting point and the destination are directly connected by the road as indicated on the map,
+    and leave the other buildings blank. Here, the blank value means infinity.
+    """
     visitPlace(departure)
 
     while 1:
-        # 거리가 가장 짧은 건물부터 긴 건물 순으로 방문, 방문한 건물은 표시
+        # Visited buildings from the shortest to the longest, and visited buildings are displayed.
         minDist = max(routing.values(), key=lambda x: x['shortestDist'])['shortestDist']
         toVisit = ''
         for name, search in routing.items():
             if 0 < search['shortestDist'] <= minDist and not search['visited']:
                 minDist = search['shortestDist']
                 toVisit = name
-        # 그래프의 모든 건물들을 방문할 때까지 위 아래의 과정을 반복한다.
+        # Repeat the process up and down until you have visited all the buildings on the graph.
         if toVisit == '':
             break
 
-        # 새로운 건물을 방문하면 그 건물과 이어진 건물들까지의 거리를 새로 바꾼다. 단, 이전에 이미 최단 거리가 구해졌었다면 거리를 서로 비교해 작은 것으로 바꾸거나 유지한다.
+        """
+        When you visit a new building, the distance between that building and the subsequent buildings is changed.
+        However, if the shortest distance has already been obtained before,
+        compare the distances with each other and change or maintain the smaller ones.
+        """
         visitPlace(toVisit)
         print("[" + vertexInfo[toVisit][0] + "] 까지의 최단거리: 약" + str(minDist) + "m")
 
-    # 경로 정리
+    # Arragement route
     Route = (routing[destination]['route'])
     Route.append(destination)
 
-    routeName.clear()  # 길 찾기 연속 클릭 시 리스트 내에 경로 쌓이는 것 방지
-    for i in range(len(Route)):  # 'A' --> '가천관' 명칭 변경
+    routeName.clear()  # Prevent path stacking in the list when user click find a way consecutively
+    for i in range(len(Route)):  # Translate 'A' --> '가천관'
         routeName.append(vertexInfo[Route[i]][0])
 
     ShortestDistance = routing[destination]['shortestDist']
@@ -154,15 +172,15 @@ def findPath(startP, endP):
         routeName) + '\n\n' + "최단 거리 : " + "약 " + str(ShortestDistance) + 'm\n'
     label['text'] = testResult
 
-    # 결과 출력 후에 지도 버튼 생성
+    # Generate map buttons after outputting results
     btn_map = Button(root, text="지도",
                      command=lambda: showMap())
     btn_map.place(relx=0.89, rely=0.9, relwidth=0.1, relheight=0.08)
 
 
-# -----------------------------
-# # GUI 구현
-# -----------------------------
+##########################################
+# # Implement GUI through python thinker
+##########################################
 Height = 363
 Width = 600
 
