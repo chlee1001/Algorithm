@@ -82,7 +82,7 @@ def showMap():
                      'color': colors[k]})
                 timePos += 1
 
-    print(lines)
+    # print(lines)
     features = [{'type': 'Feature', 'geometry': {'type': 'LineString', 'coordinates': line['coordinates'], },
                  'properties': {'times': line['dates'],
                                 'style': {'color': line['color'], 'weight': line['weight'] if 'weight' in line else 5}
