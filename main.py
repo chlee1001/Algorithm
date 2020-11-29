@@ -29,15 +29,15 @@ file.close()
 routeName = []
 
 now = time.localtime()
+min = now.tm_min
+hour = now.tm_hour
+mday = now.tm_mday
+month = now.tm_mon
+year = now.tm_year
 timeSet = []
-timeTemp = 0
 
 for i in range(20):
-    year = now.tm_year
-    month = now.tm_mon
-    mday = now.tm_mday
-    hour = now.tm_hour
-    min = now.tm_min + timeTemp
+
     if min >= 60:
         hour += 1
         min -= 60
@@ -51,7 +51,7 @@ for i in range(20):
         year += 1
         month -= 11
     timeSet.append("%04d-%02d-%02dT%02d:%02d:%02d" % (year, month, mday, hour, min, now.tm_sec))
-    timeTemp += 7
+    min += 7
 
 
 def showMap():
