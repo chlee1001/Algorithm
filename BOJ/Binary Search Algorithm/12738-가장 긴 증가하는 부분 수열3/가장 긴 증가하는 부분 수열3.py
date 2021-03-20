@@ -1,25 +1,23 @@
 import sys
+from bisect import bisect_left
 
 input = sys.stdin.readline
 
 N = int(input())
 num_list = list(map(int, input().split()))
-dp = [0]
+dp = []
 
-for i in range(N):
-    start = 0
-    end = len(dp) - 1
 
-    while start <= end:
-        mid = (start + end) // 2
-        if num_list[i] > dp[mid]:
-            start = mid + 1
-        else:
-            end = mid - 1
-
-    if start >= len(dp):
-        dp.append(num_list[i])
+def binary_search(arr, x):
+    k = bisect_left(arr, x)
+    if k >= len(arr):
+        arr.append(x)
     else:
-        dp[start] = num_list[i]
+        arr[k] = x
+    return arr
 
-print(len(dp) - 1)
+
+for num in num_list:
+    dp = binary_search(dp, num)
+
+print(len(dp))
