@@ -13,7 +13,7 @@ def BFS(graph, start):
         if position == K:
             return graph[position]
         for nx in (position - 1, position + 1, position * 2):
-            if 0 <= nx < MAX and not graph[nx]:
+            if 0 <= nx <= MAX and not graph[nx]:
                 graph[nx] = graph[position] + 1
                 queue.append(nx)
 
