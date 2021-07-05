@@ -1,4 +1,4 @@
-# Algorithm (21.06.29) 
+# Algorithm (21.07.06)
 알고리즘 공부하기
 
 ### 알고리즘 공부 순서 정의
@@ -35,6 +35,7 @@ Algorithm
     - Brute Force Algorithm
     - DFS, BFS
   - Sorting Algorithm
+  - Tree
 - Programmers: 프로그래머스 문제풀이
   - Dynamic Programming
   - Hash
