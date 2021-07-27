@@ -1,4 +1,4 @@
-# Algorithm (21.07.06)
+# Algorithm (Update on. 21.07.27)
 알고리즘 공부하기
 
 ### 알고리즘 공부 순서 정의
@@ -35,6 +35,7 @@ Algorithm
     - Brute Force Algorithm
     - DFS, BFS
   - Sorting Algorithm
+  - String
   - Tree
 - Programmers: 프로그래머스 문제풀이
   - Dynamic Programming
@@ -42,6 +43,8 @@ Algorithm
   - Heap
   - Kakao
   - Search
+  - Stack, Queue
+  - 연습문제
 - 기타: SWEA, 코드잇 문제풀이
 - 이것이 코딩테스트다 with Python: 파이썬을 이용한 코딩테스트 입문관련
 
