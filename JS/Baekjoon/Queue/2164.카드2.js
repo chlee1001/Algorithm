@@ -11,8 +11,8 @@
  */
 
 const [N] = require('fs').readFileSync('/dev/stdin').toString().trim().split('\n');
-const queue = Array.from(Array(parseInt(N, 10) + 1).keys())
-let pos = 1;
+const queue = Array.from({length: parseInt(N, 10)}, (_, i) => i + 1)
+let pos = 0;
 
 for (let i = 1; i < N; i++) {
     pos += 1;
