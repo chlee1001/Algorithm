@@ -1,7 +1,5 @@
 const [...input] = require('fs').readFileSync('/dev/stdin').toString().trim().split(' ');
 
-// const result = ['ascending', 'descending', 'mixed'];
-
 let ascending = true;
 let descending = true;
 
