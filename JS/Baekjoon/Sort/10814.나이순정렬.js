@@ -6,12 +6,11 @@
 
 const [N, ...input] = require('fs').readFileSync('/dev/stdin').toString().trim().split('\n');
 
+const result = [];
 const members = input.map(member => member.split(" "));
-const orderedMembers = members.sort((a, b) => Number(a[0]) - Number(b[0]));
+members.sort((a, b) => Number(a[0]) - Number(b[0])).forEach(member => result.push(`${member[0]} ${member[1]}`));
 
-for (const orderedMember of orderedMembers) {
-    console.log(orderedMember[0], orderedMember[1]);
-}
+console.log(result.join('\n'));
 
 // 단순한 방법
 // input.sort((a, b) => parseFloat(a) - parseFloat(b));
