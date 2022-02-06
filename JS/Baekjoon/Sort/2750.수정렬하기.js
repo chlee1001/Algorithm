@@ -5,7 +5,7 @@
 
 const [N, ...input] = require('fs').readFileSync('/dev/stdin').toString().trim().split('\n');
 
-inputNums = input.map(num => Number(num));
+const inputNums = input.map(num => Number(num));
 const result = inputNums.sort((a, b) => a - b);
 
 console.log(result.join('\n'));
