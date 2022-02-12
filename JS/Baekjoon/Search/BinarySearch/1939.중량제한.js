@@ -11,7 +11,7 @@ const bridge = {};
 const [departure, dest] = input[M].split(" ").map(Number);
 
 
-const bfs = (c) => {
+const bfs = (c) => { // 경로 유무 확인
     const queue = [departure];
     let visited = new Array(N + 1).fill(false);
     visited[departure] = true;
@@ -45,10 +45,10 @@ for (let i = 0; i < M; i++) {
 let result = min;
 while (min <= max) {
     let mid = Math.floor((min + max) / 2);
-    if (bfs(mid)) {
+    if (bfs(mid)) { // 이동가능 -> 중량 증가
         result = mid;
         min = mid + 1;
-    } else {
+    } else { // 이동불가 -> 중량 감소
         max = mid - 1
     }
 }
